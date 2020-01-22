@@ -95,8 +95,9 @@ let GetEntry = (function(){
         let entryObject = {};
         files.forEach(function(ele,idx){
             
-            let reduces = ele.replace(base,'');
-            console.log(ele,base,reduces);
+            let reduces = ele.replace(base,'').replace(filenameExp,'');
+            
+            console.log(reduces,ele);
             entryObject[reduces] = path.resolve(__dirname,reduces);
         });
         return entryObject;
