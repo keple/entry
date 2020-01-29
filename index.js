@@ -95,7 +95,8 @@ let GetEntry = (function(){
         let entryObject = {};
         files.forEach(function(ele,idx){
             
-            let reduces = ele.replace(base,'').replace(filenameExp,'');
+            let reduces = ele.replace(base,'')
+            //.replace(filenameExp,'');
             
             console.log(reduces,ele);
             entryObject[reduces] = path.resolve(__dirname,reduces);
@@ -114,7 +115,7 @@ let entry = new GetEntry({
     exclude : ['node_modules','highchart','lib','webpack','dist']
 });
 console.log(entry);
-entry.setRegexp('\.js$');
+entry.setRegexp('\.(js|css)$');
 console.log(entry.returnEntryObject());
 
 
