@@ -6,19 +6,24 @@ let GetEntry = (function(){
     let paths;
     let dirCounts = 0;
     let filenameExp;
+    let subExp;
     let separator = "\\";
     let base;
     let excludePaths = [];
+    let hmrFlag = false;
     function GetEntry(option){
         fileSystem = option.fs;
         paths = option.path;
         base = option.base;
         excludePaths = option.exclude;
+        hmrFlag = option.useHmr;
     }
     GetEntry.prototype.setRegexp = function(regExp){
         filenameExp = new RegExp(regExp);
     }
-
+    GetEntry.prototype.setSubRegExp = function(regExp){
+        subExp = new RegExp(regExp);
+    }
     GetEntry.prototype.returnEntryObject = function(){
         
         if(!checkExclude(base)){
@@ -95,11 +100,20 @@ let GetEntry = (function(){
         let entryObject = {};
         files.forEach(function(ele,idx){
             
-            let reduces = ele.replace(base,'')
-            //.replace(filenameExp,'');
+            let reduces = ele.replace(base+"\\",'').replace(/\\/g,'/');
+            if(subExp!==undefined && !subExp.test(reduces)){
+                reduces = reduces.replace(filenameExp,'');
+            }
             
-            console.log(reduces,ele);
-            entryObject[reduces] = path.resolve(__dirname,reduces);
+            console.log(reduces,ele,hmrFlag);
+
+            if(!hmrFlag){
+                entryObject[reduces] = path.resolve(__dirname,reduces);
+            }else{
+                entryObject[reduces] = ['webpack-hot-middleware/client?name=' + idx];
+                entryObject[reduces].push(path.resolve(__dirname,reduces));
+            }
+            
         });
         return entryObject;
     };
@@ -112,10 +126,12 @@ let entry = new GetEntry({
     fs:fs,
     path : path,
     base : path.resolve(__dirname,'../pine-ui/'),
-    exclude : ['node_modules','highchart','lib','webpack','dist']
+    exclude : ['node_modules','highchart','lib','webpack','dist','server'],
+    useHmr : true
 });
 console.log(entry);
 entry.setRegexp('\.(js|css)$');
+entry.setSubRegExp('\.css$');
 console.log(entry.returnEntryObject());
 
 
