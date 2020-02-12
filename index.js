@@ -1,13 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+let fs = require('fs');
+let path = require('path');
 
-let GetEntry = (function(){
+var GetEntry=(function(){
     let fileSystem;
     let paths;
     let dirCounts = 0;
     let filenameExp;
-    let subExp;
-    let separator = "\\";
+    let separator = path.sep;
     let base;
     let excludePaths = [];
     let hmrFlag = false;
@@ -61,7 +60,6 @@ let GetEntry = (function(){
         let innerDirObj = getDirectories(currentDir,false); 
         let tempFiles = innerDirObj.scripts;
         console.log("inner dir counts : ",innerDirObj.counts);
-        //console.log("inner dir directories",innerDirObj.directories);
         console.log("inner scripts counts",innerDirObj.scripts.length);
         for(let i = 0 ; i < innerDirObj.counts; i++){
             tempFiles = tempFiles.concat(search(base,false,innerDirObj.directories[i]));
@@ -99,26 +97,23 @@ let GetEntry = (function(){
     let genEntry = function(files){
         let entryObject = {};
         files.forEach(function(ele,idx){
-            
-            let reduces = ele.replace(base+"\\",'').replace(/\\/g,'/');
+            let reduces = ele.replace(base+"\\",'').replace(/\\/g,path.sep);
+            console.log(reduces)
             if(subExp!==undefined && !subExp.test(reduces)){
                 reduces = reduces.replace(filenameExp,'');
             }
-            
-            console.log(reduces,ele,hmrFlag);
-
+            //console.log("key" , reduces , "value" , ele );
             if(!hmrFlag){
-                entryObject[reduces] = path.resolve(__dirname,reduces);
+                entryObject[reduces] = ele;
             }else{
-                entryObject[reduces] = ['webpack-hot-middleware/client?name=' + idx];
-                entryObject[reduces].push(path.resolve(__dirname,reduces));
+                entryObject[reduces] = ['webpack-hot-middleware/client?name=lazyLoadScripts&path=/js/__webpack_hmr&reload=true'];
+                entryObject[reduces].push(ele);
             }
-            
         });
         return entryObject;
     };
     return GetEntry;
-})()
+})();
 
 
 
