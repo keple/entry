@@ -97,7 +97,7 @@ var GetEntry=(function(){
     let genEntry = function(files){
         let entryObject = {};
         files.forEach(function(ele,idx){
-            let reduces = ele.replace(base+"\\",'').replace(/\\/g,path.sep);
+            let reduces = ele.replace(base+path.sep,'').replace(/\\/g,path.sep);
             console.log(reduces)
             if(subExp!==undefined && !subExp.test(reduces)){
                 reduces = reduces.replace(filenameExp,'');
